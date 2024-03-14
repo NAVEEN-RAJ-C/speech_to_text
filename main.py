@@ -32,3 +32,52 @@ def transcribe_audio(audio_file):
     for result in response.results:
         transcribed_text += result.alternatives[0].transcript.strip() + " "
     return transcribed_text
+
+
+# Define main function
+def main():
+    # Set up Streamlit UI
+    st.title("Speech-to-Text Web Application")
+
+    # Initialize PyAudio for audio capture
+    p = pyaudio.PyAudio()
+
+    # Capture audio from microphone
+    st.write("Click below to start recording:")
+    if st.button("Start Recording"):
+        with st.spinner("Recording..."):
+            # Set up audio stream
+            stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8000)
+            frames = []
+
+            # Capture audio data in chunks
+            for i in range(0, int(16000 / 8000 * 5)):  # Capture audio for 5 seconds
+                data = stream.read(8000)
+                frames.append(data)
+
+            # Save captured audio to WAV file
+            audio_file_path = "audio.wav"
+            with wave.open(audio_file_path, "wb") as wf:
+                wf.setnchannels(1)
+                wf.setsampwidth(pyaudio.PyAudio().get_sample_size(pyaudio.paInt16))
+                wf.setframerate(16000)
+                wf.writeframes(b"".join(frames))
+
+            # Close audio stream
+            stream.stop_stream()
+            stream.close()
+
+            # Call function to transcribe audio
+            transcribed_text = transcribe_audio(audio_file_path)
+
+            # Display transcribed text
+            st.write("Transcribed Text:")
+            st.write(transcribed_text)
+
+    # Close PyAudio instance
+    p.terminate()
+
+
+# Run main function
+if __name__ == "__main__":
+    main()
