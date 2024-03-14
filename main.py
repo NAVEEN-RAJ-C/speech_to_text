@@ -15,11 +15,14 @@ def transcribe_audio(audio):
     # Process audio in chunks
     while True:
         data = audio.read(4000)
-        if len(data) == 0:
+        if len(data) == 0 or st.session_state.stop_button_clicked:
             break
         if recognizer.AcceptWaveform(data):
             result = recognizer.Result()
             st.write(result)
+        # Check if the stop button is clicked
+        if st.session_state.stop_button_clicked:
+            break
 
 
 # Define main function
@@ -33,9 +36,12 @@ def main():
     # Capture audio from microphone
     st.write("Click below to start recording:")
     if st.button("Start Recording"):
+        # Add stop button
+        st.session_state.stop_button_clicked = False
+        st.session_state.stop_button_clicked = st.button("Stop Recording")
         with st.spinner("Recording..."):
             # Set up audio stream
-            stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8000)
+            stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=1024)
 
             # Call function to transcribe audio
             transcribe_audio(stream)
