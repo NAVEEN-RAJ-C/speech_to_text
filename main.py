@@ -1,15 +1,13 @@
 # Import necessary libraries
 import streamlit as st
 import vosk
-import sys
-import os
 import pyaudio
 
 
 # Define function to transcribe speech to text using Vosk
 def transcribe_audio(audio):
     # Initialize Vosk recognizer
-    model = vosk.Model("D:/CNR/GUVI_ZEN_DS/Projects/speech_to_text/vosk-model-en-us-0.22-lgraph")  # "model_folder_path"
+    model = vosk.Model("D:/CNR/GUVI_ZEN_DS/Projects/speech_to_text/vosk-model-en-in-0.5")  # "model_folder_path"
     recognizer = vosk.KaldiRecognizer(model, 16000)
 
     # Process audio in chunks
@@ -20,9 +18,6 @@ def transcribe_audio(audio):
         if recognizer.AcceptWaveform(data):
             result = recognizer.Result()
             st.write(result)
-        # Check if the stop button is clicked
-        if st.session_state.stop_button_clicked:
-            break
 
 
 # Define main function
